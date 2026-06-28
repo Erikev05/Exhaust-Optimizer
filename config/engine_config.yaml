@@ -1,0 +1,26 @@
+# Exhaust Optimizer Input Configuration
+
+thermodynamics:
+  T0: 850           # Initial exhaust gas temperature (K)
+  T_env: 300        # Ambient environment temperature (K)
+  rho: 1.225        # Air density (kg/m^3)
+
+geometry:
+  D: 0.035          # Diameter of the exhaust runner pipe (m)
+
+valve_timing:
+  EVO: 64           # Exhaust Valve Open (degrees before BDC)
+  EVC: 24           # Exhaust Valve Close (degrees after TDC)
+  IVO: 39           # Intake Valve Open (degrees before TDC)
+  IVC: 65           # Intake Valve Close (degrees after BDC)
+  wave_delay: 40    # Time for wave to form in crank degrees (ref: Heywood)
+
+engine_specs:
+  vol: 599          # Total engine displacement (cc / cm^3)
+  n_cyl: 4          # Number of cylinders
+
+solver_settings:
+  min_RPM: 3000
+  max_RPM: 14000
+  stepsize_RPM: 500
+  epsilon: 0.001    # Convergence tolerance for iterative solver
