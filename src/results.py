@@ -84,3 +84,46 @@ def plot_figure(results: dict) -> plt.Figure:
 
     fig.tight_layout()
     return fig
+
+
+def plot_sensitivity(sens_df: pd.DataFrame, output_dir: str = None) -> list[plt.Figure]:
+    """
+    One heatmap figure per model, saved individually.
+    Returns a list of Figure objects.
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+    import os
+
+    models = sens_df.columns.get_level_values(0).unique()
+    cmap = "RdBu_r"
+    vmax = sens_df.abs().max().max()
+    norm = mcolors.TwoSlopeNorm(vmin=-vmax, vcenter=0, vmax=vmax)
+
+    figs = []
+    for model in models:
+        sub = sens_df[model].dropna(axis=1, how="all").T  # rows = params, cols = RPM
+
+        fig, ax = plt.subplots(figsize=(12, max(3, len(sub.index) * 0.8)))
+
+        im = ax.imshow(sub.values, aspect="auto", cmap=cmap, norm=norm)
+        ax.set_title(f"Sensitivity — {model}", fontsize=13, fontweight="bold")
+        ax.set_xticks(range(len(sub.columns)))
+        ax.set_xticklabels([int(r) for r in sub.columns], rotation=90, fontsize=8)
+        ax.set_yticks(range(len(sub.index)))
+        ax.set_yticklabels(sub.index, fontsize=11)
+        ax.set_xlabel("RPM", fontsize=10)
+
+        fig.colorbar(im, ax=ax, label="Normalised sensitivity  S = (ΔL/L)/(Δp/p)")
+        fig.tight_layout()
+
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            safe_name = model.lower().replace(" ", "_")
+            path = os.path.join(output_dir, f"sensitivity_{safe_name}.png")
+            fig.savefig(path, dpi=150, bbox_inches="tight")
+            print(f"Saved: {path}")
+
+        figs.append(fig)
+
+    return figs

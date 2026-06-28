@@ -12,11 +12,11 @@ import numpy as np
 from library.constants import Constants as const
 
 
-def _speed_of_sound(T: float, gamma: float, R: float) -> float:
+def _speed_of_sound(gamma: float, R: float, T: float,) -> float:
     return np.sqrt(gamma * R * T)
 
 
-def primary_length_isothermal(RPM: float, T0: float, theta: float) -> float:
+def primary_length_isothermal(RPM: float, T0: float, theta: float, gamma: float=const.gamma_ex) -> float:
     """
     Isothermal variant — single speed of sound at exhaust port temperature.
 
@@ -28,7 +28,7 @@ def primary_length_isothermal(RPM: float, T0: float, theta: float) -> float:
     Returns:
         Primary pipe length (m)
     """
-    c = _speed_of_sound(T0, const.gamma_ex, const.R_gas)
+    c = _speed_of_sound(gamma, const.R_gas, T0)
     return c * theta / (RPM * 12)
 
 
@@ -42,6 +42,9 @@ def primary_length_thermal(
     n_cyl: int,
     rho: float,
     epsilon: float,
+    gamma: float=const.gamma_ex,
+    h: float = const.h,
+    cp: float = const.cp,
 ) -> float:
     """
     Thermal variant — iterates until pipe length converges.
@@ -57,6 +60,7 @@ def primary_length_thermal(
         n_cyl:   Number of cylinders
         rho:     Air density (kg/m^3)
         epsilon: Convergence tolerance (m)
+        gamma:   Ratio of sepcific heats
 
     Returns:
         Primary pipe length (m)
@@ -66,11 +70,9 @@ def primary_length_thermal(
     L = primary_length_isothermal(RPM, T0, theta)  # physical initial guess
 
     for _ in range(500):  
-        T_end = T_env + (T0 - T_env) * np.exp(
-            -(const.h * np.pi * D * L) / (m_dot * const.cp)
-        )
+        T_end = T_env + (T0 - T_env) * np.exp(-(h * np.pi * D * L) / (m_dot * cp))
         T_avg = (T0 + T_end) / 2
-        L_new = _speed_of_sound(T_avg, const.gamma_ex, const.R_gas) * theta / (RPM * 12)
+        L_new = _speed_of_sound(gamma, const.R_gas, T_avg) * theta / (RPM * 12)
 
         if abs(L_new - L) < epsilon:
             return L_new

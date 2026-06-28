@@ -1,7 +1,7 @@
 # Exhaust Optimizer Input Configuration
 
 thermodynamics:
-  T0: 850           # Initial exhaust gas temperature (K)
+  T0: 1200           # Initial exhaust gas temperature (K)
   T_env: 300        # Ambient environment temperature (K)
   rho: 1.225        # Air density (kg/m^3)
 

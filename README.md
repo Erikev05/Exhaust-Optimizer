@@ -47,6 +47,10 @@ Suppress the plot window (useful on servers):
 python main.py --no-plot
 ```
 
+Run a sensitivity study on all formulas:
+```bash
+python main.py --sensitivity
+```
 ---
 
 ## Configuration
